@@ -1,0 +1,144 @@
+﻿<Page
+    x:Class="Todos.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Todos"
+    xmlns:md="using:Todos.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:Name="AddAppBarButton" Icon="Add" Label="Add" Click="AddAppBarButton_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+    <Page.Resources>
+        <md:BoolToVisibilityConverter x:Key="BoolToVisConverter" />
+    </Page.Resources>
+    <Grid x:Name="MyGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="0,0,10,0">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin800">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="800"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin600">
+                    <VisualState.Setters>
+                        <Setter Target="InlineToDoItemViewGrid.(UIElement.Visibility)" Value="Collapsed"/>
+                        <Setter Target="ToDoListView.(Grid.ColumnSpan)" Value="2"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="600"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.Setters>
+                        <Setter Target="InlineToDoItemViewGrid.(UIElement.Visibility)" Value="Collapsed"/>
+                        <Setter Target="ToDoListView.(Grid.ColumnSpan)" Value="2"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="ToDoListView" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+           
+            <TextBlock  Grid.Row="0" x:Name="textBlock" Text="Todos" Style="{StaticResource HeaderTextBlockStyle}" HorizontalAlignment="Left" Margin="20,20,0,20" Width="194"/>
+            <StackPanel Grid.Row ="1" Margin="36, 0">
+                <TextBox Header="请输入相关todo的日期或文本" x:Name="Query"/>
+                <Button Content="查询" Click="BtnGetAll_Click" HorizontalAlignment="Center"/>
+            </StackPanel>
+            <ScrollViewer Grid.Row="2"  Margin="20">
+                <ListView x:Name="ItemListView" IsItemClickEnabled="True" ItemClick="TodoItem_ItemClicked"
+                          ItemsSource="{x:Bind ViewModel.AllItems}" Width="814" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="md:TodoItem">
+                            <UserControl>
+                                <Grid Height="100">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="VisualStateGroup">
+                                            <VisualState x:Name="VisualStateMin800">
+                                                <VisualState.Setters>
+                                                    <Setter Target="image.Visibility" Value="Visible"/>
+                                                </VisualState.Setters>
+                                                <VisualState.StateTriggers>
+                                                    <AdaptiveTrigger MinWindowWidth="800"/>
+                                                </VisualState.StateTriggers>
+                                            </VisualState>
+                                            <VisualState x:Name="VisualStateMin500">
+                                                <VisualState.Setters>
+                                                    <Setter Target="image.Visibility" Value="Collapsed"/>
+                                                </VisualState.Setters>
+                                                <VisualState.StateTriggers>
+                                                    <AdaptiveTrigger MinWindowWidth="500"/>
+                                                </VisualState.StateTriggers>
+                                            </VisualState>
+                                            <VisualState x:Name="VisualStateMin0">
+                                                <VisualState.Setters>
+                                                    <Setter Target="image.Visibility" Value="Collapsed"/>
+                                                </VisualState.Setters>
+                                                <VisualState.StateTriggers>
+                                                    <AdaptiveTrigger MinWindowWidth="1"/>
+                                                </VisualState.StateTriggers>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="72"/>
+                                </Grid.ColumnDefinitions>
+                                 <CheckBox x:Name="TodoCheckBox" Grid.Column="0" IsChecked="{x:Bind completed}" VerticalAlignment="Center" Height="32" Width="32"/>
+                                <Image x:Name="image" Grid.Column="1" Source="{x:Bind ImagePath}" Height="120" Width="200" Margin="0,3,12,7"/>
+                                <TextBlock Text="{x:Bind title}" Grid.Column="2" VerticalAlignment="Center" Foreground="Black" FontWeight="Normal" FontSize="15" LineHeight="20" TextWrapping="Wrap" />
+                                <Line Grid.Column="2" Visibility="{Binding IsChecked, ElementName=TodoCheckBox, Converter={StaticResource BoolToVisConverter}}" Stretch="Fill" Stroke="Black" StrokeThickness="2" X1="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,20,0"/>
+                                    <AppBarButton Grid.Column="3" Icon="Setting" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                        <AppBarButton.Flyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="share" Click="onShare"/>
+                                            </MenuFlyout>
+                                        </AppBarButton.Flyout>
+                                    </AppBarButton>
+                                </Grid>
+                            </UserControl>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+            <Button Content="Update Tile" Grid.Row="3" Margin="20" HorizontalAlignment="center" Background="#33443F39" Click="onClick"/>
+        </Grid>
+        <Grid  x:Name="InlineToDoItemViewGrid" Margin="8,40,40,40" Grid.Column="1">
+            <ScrollViewer Margin="0,0,0,75">
+                <StackPanel>
+                    <Image x:Name="image2" Source="{x:Bind ViewModel.SelectedItem.ImagePath}" Width="350" Height="180" Stretch="UniformToFill"/>
+                    <RelativePanel Width="350">
+                        <AppBarButton x:Name="SelectPictureButton" Icon="Pictures" Label="select" RelativePanel.AlignRightWithPanel="True" Click="Click_SelectPicture"/>
+                    </RelativePanel>
+                    
+                    <TextBox x:Name="title2" Width="325" Header="Title" Margin="0,4,0,0" />
+                    <TextBox x:Name="details2" Width="326" Height="96" Margin="0,4,0,0" Header="Details" />
+                    <DatePicker x:Name="dueDate2" Width="325" Margin="0,4,0,0" Header="Due Date" HorizontalAlignment="Center" />
+                    <RelativePanel Width="350" Margin="0,4,0,0">
+                        <Button x:Name="createButton" Content="Create" Margin="10,0,-9,0" Width="62" Click="CreateButton_Clicked"></Button>
+                        <Button x:Name="CancelButton" Content="Cancel" RelativePanel.AlignRightWithPanel="True" Width="63" Margin="-34,0,0,0" Click="click_back"></Button>
+                    </RelativePanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+
+</Page>
